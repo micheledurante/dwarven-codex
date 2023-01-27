@@ -1,16 +1,37 @@
-import { searchDictionary } from "./search.mjs";
+import { findSearchMatches } from "./search.mjs";
 import { PROPS, scope } from "./scope.mjs";
+
+const MAX_MATCHES_IN_PREVIEW = 10;
 
 // Preview box with the dynamic list of matches. This is updated as the user changes the word search
 class SearchMatchesList extends HTMLElement {
+    template;
+    shadowRoot;
+
     constructor() {
         super();
+        this.template = document.getElementById("search-matches-item").content;
+        this.shadowRoot = this.attachShadow({ mode: "open" });
     }
 
     updateSearchMatchesList = (prop, old_val, new_val) => {
-        if (prop === PROPS.MATCHES) {
-            console.log(new_val);
+        if (prop !== PROPS.MATCHES) {
+            return;
         }
+
+        let new_matches = [];
+
+        for (let i = 0; i < new_val.length; i++) {
+            if (i === MAX_MATCHES_IN_PREVIEW) {
+                break;
+            }
+
+            const clone = this.template.firstElementChild.cloneNode(true);
+            clone.textContent = new_val[i];
+            new_matches.push(clone);
+        }
+
+        this.shadowRoot.replaceChildren(...new_matches);
     };
 
     connectedCallback() {
@@ -29,12 +50,7 @@ class WordInput extends HTMLInputElement {
     }
 
     onInput(value) {
-        if (!value.trim().length) {
-            return;
-        }
-
         scope.word = value;
-        void searchDictionary();
     }
 
     connectedCallback() {
@@ -42,16 +58,18 @@ class WordInput extends HTMLInputElement {
             scope.word = this.value;
         }
 
+        scope.subscribe(findSearchMatches);
         this.addEventListener("input", (e) => this.onInput(e.target.value));
     }
 
     disconnectedCallback() {
+        scope.unsubscribe(findSearchMatches);
         this.removeEventListener("input", this.onInput);
     }
 }
 
 // Dropdown to select the dictionary to search, expressed in terms of direction between languages (left -> right)
-class LanguageSelector extends HTMLSelectElement {
+class DictionarySelector extends HTMLSelectElement {
     constructor() {
         super();
     }
@@ -76,11 +94,6 @@ class SearchButton extends HTMLButtonElement {
     }
 
     onClick() {
-        if (!scope.word) {
-            return;
-        }
-
-        void searchDictionary();
     }
 
     connectedCallback() {
@@ -92,4 +105,4 @@ class SearchButton extends HTMLButtonElement {
     }
 }
 
-export { LanguageSelector, SearchButton, SearchMatchesList, WordInput };
+export { DictionarySelector, SearchButton, SearchMatchesList, WordInput };

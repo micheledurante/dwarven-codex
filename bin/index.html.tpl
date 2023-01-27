@@ -8,7 +8,7 @@
 
 <head>
     <meta charset="utf-8"/>
-    <title>Dwarven Codex</title>
+    <title>The Dwarven Codex</title>
 
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="icon" href="favicon.ico" type="image/x-icon" />
@@ -34,6 +34,9 @@
 
 <body>
 <main>
+    <header>
+        <h1>The Dwarven Codex</h1>
+    </header>
     <article>
         <div id="dwarven-dictionary">
             <header>
@@ -45,8 +48,8 @@
                     </search-matches-list>
                 </div>
                 <div>
-                    <label for="language-selector">Language</label>
-                    <select is="language-selector" id="language-selector" required>
+                    <label for="dictionary-selector">Dictionary</label>
+                    <select is="dictionary-selector" id="dictionary-selector" required>
                         <option value="0" selected>English -> Dwarven</option>
                     </select>
                 </div>

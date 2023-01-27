@@ -5,7 +5,7 @@ import { encode } from "https://deno.land/std@0.174.0/encoding/base64.ts";
 
 const date = new Date();
 
-let build = {
+const build = {
     arch: Deno.build.os + " " + Deno.build.arch,
     date: date.toISOString(),
     // https://calver.org/ YYYY.MM.DD
@@ -19,7 +19,7 @@ let build = {
 // Process dict files
 
 /**
- * Create a searchable JSON structure from the Dwarven dictionary create by VABritto:
+ * Create a searchable JSON structure from the Dwarven dictionary created by VABritto:
  * @link http://www.bay12forums.com/smf/index.php?action=profile;u=124675
  *
  * Sources:
