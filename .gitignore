@@ -1,0 +1,8 @@
+# IDE
+.idea/
+.vscode/
+
+# compiled files
+web/json/
+web/index.html
+build.json

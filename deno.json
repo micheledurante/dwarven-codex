@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "noImplicitAny": false,
+        "noImplicitThis": false,
+        "noImplicitReturns": true,
+        "strictNullChecks": false,
+        "lib": [
+            "dom",
+            "deno.ns"
+        ]
+    },
+    "fmt": {
+        "files": {
+            "exclude": [
+                "web/json/"
+            ]
+        },
+        "options": {
+            "lineWidth": 120,
+            "indentWidth": 4,
+            "singleQuote": false
+        }
+    }
+}
