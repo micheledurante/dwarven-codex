@@ -10,6 +10,9 @@
     <meta charset="utf-8"/>
     <title>Dwarven Codex</title>
 
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+
     <style>
         label {
             display: block;
@@ -37,6 +40,9 @@
                 <div>
                     <label for="word-input">Word Search</label>
                     <input is="word-input" id="word-input" required/>
+                    <search-matches-list>
+                        <ul slot="search-matches-list"></ul>
+                    </search-matches-list>
                 </div>
                 <div>
                     <label for="language-selector">Language</label>
@@ -52,5 +58,9 @@
     </article>
 </main>
 </body>
+
+<template id="search-matches-item">
+    <li></li>
+</template>
 
 </html>

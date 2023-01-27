@@ -17,14 +17,13 @@ You can now run `web/index.html` with a modern browser: there is no support for 
 
 ES2015 modules are used to import `.mjs` files. The entry point is the file `web/modules/main.mjs`.
 
-`web/modules/main.js` this file is responsible for defining the global state of the other components and for registering
-them in the DOM.
+`web/modules/main.js` for registering web components in the DOM.
 
 The file `bin/index.html.tpl` is used to bootstrap the JS web components: it contains a mix of HTML, CSS and the JS
 script tag used as entry point.
 
-To run correctly, it needs to be processed by `bin/install.ts` script. The script will generate its content and
-create the file in the correct location to be served to web clients.
+To run correctly, it needs to be processed by `bin/install.ts` script. The script will generate its content and create
+the file in the correct location to be served to web clients.
 
 ## Deploy
 

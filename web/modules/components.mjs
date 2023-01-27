@@ -1,19 +1,43 @@
 import { searchDictionary } from "./search.mjs";
-import { scope } from "./main.mjs";
+import { PROPS, scope } from "./scope.mjs";
 
+// Preview box with the dynamic list of matches. This is updated as the user changes the word search
+class SearchMatchesList extends HTMLElement {
+    constructor() {
+        super();
+    }
+
+    updateSearchMatchesList = (prop, old_val, new_val) => {
+        if (prop === PROPS.MATCHES) {
+            console.log(new_val);
+        }
+    };
+
+    connectedCallback() {
+        scope.subscribe(this.updateSearchMatchesList);
+    }
+
+    disconnectedCallback() {
+        scope.unsubscribe(this.updateSearchMatchesList);
+    }
+}
+
+// Input for the word to search in the chosen dictionary
 class WordInput extends HTMLInputElement {
     constructor() {
         super();
     }
 
     onInput(value) {
+        if (!value.trim().length) {
+            return;
+        }
+
         scope.word = value;
         void searchDictionary();
     }
 
     connectedCallback() {
-        console.log("DEBUG --- WordInput connectedCallback");
-
         if (this.value) {
             scope.word = this.value;
         }
@@ -26,17 +50,17 @@ class WordInput extends HTMLInputElement {
     }
 }
 
+// Dropdown to select the dictionary to search, expressed in terms of direction between languages (left -> right)
 class LanguageSelector extends HTMLSelectElement {
     constructor() {
         super();
     }
 
     onChange(value) {
-        scope.direction = value;
+        scope.direction = parseInt(value);
     }
 
     connectedCallback() {
-        console.log("DEBUG --- LanguageSelector connectedCallback");
         this.addEventListener("input", (e) => this.onChange(e.target.value));
     }
 
@@ -45,6 +69,7 @@ class LanguageSelector extends HTMLSelectElement {
     }
 }
 
+// Button to perform the search on the given word and in the given direction. Populates the detailed view of the results
 class SearchButton extends HTMLButtonElement {
     constructor() {
         super();
@@ -59,7 +84,6 @@ class SearchButton extends HTMLButtonElement {
     }
 
     connectedCallback() {
-        console.log("DEBUG --- SearchButton connectedCallback");
         this.addEventListener("click", (e) => this.onClick(e.target.value));
     }
 
@@ -68,4 +92,4 @@ class SearchButton extends HTMLButtonElement {
     }
 }
 
-export { LanguageSelector, SearchButton, WordInput };
+export { LanguageSelector, SearchButton, SearchMatchesList, WordInput };
