@@ -20,10 +20,6 @@ function searchEngToDwa(word) {
 }
 
 const searchDictionary = async function () {
-    if (!scope.word) {
-        return;
-    }
-
     if (!scope.dwaToEng) {
         const res = await fetch(new Request(DWA_TO_ENG_URL));
         scope.dwaToEng = await res.json();

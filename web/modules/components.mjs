@@ -14,7 +14,7 @@ class WordInput extends HTMLInputElement {
     connectedCallback() {
         console.log("DEBUG --- WordInput connectedCallback");
 
-        if (this.value !== undefined) {
+        if (this.value) {
             scope.word = this.value;
         }
 
@@ -51,6 +51,10 @@ class SearchButton extends HTMLButtonElement {
     }
 
     onClick() {
+        if (!scope.word) {
+            return;
+        }
+
         void searchDictionary();
     }
 
