@@ -29,7 +29,7 @@ const findSearchMatches = async function (prop, old_val, new_val) {
     }
 
     if (!DWA_TO_ENG) {
-        const res = await fetch(new Request(DWA_TO_ENG_URL));
+        const res = await fetch(new Request(DWA_TO_ENG_URI));
         DWA_TO_ENG = await res.json();
     }
 

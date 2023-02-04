@@ -18,13 +18,14 @@
             display: block;
         }
 
+        a,
         select,
         button {
             cursor: pointer;
         }
     </style>
 
-    <script>const DWA_TO_ENG_URL = "json/dwa-to-eng.#DICT_HASH#.json";</script>
+    <script>const DWA_TO_ENG_URI = "json/dwa-to-eng.#DICT_HASH#.json";</script>
 
     <script type="module" src="modules/main.mjs"
             integrity="#MODULE_ALGO#-#MODULE_HASH#"

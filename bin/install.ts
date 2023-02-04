@@ -2,18 +2,34 @@ import { readLines } from "https://deno.land/std@0.174.0/io/buffer.ts";
 import { StringReader } from "https://deno.land/std@0.174.0/io/string_reader.ts";
 import { crypto, DigestAlgorithm } from "https://deno.land/std@0.174.0/crypto/crypto.ts";
 import { encode } from "https://deno.land/std@0.174.0/encoding/base64.ts";
+import { encodeToString } from "https://deno.land/std@0.97.0/encoding/hex.ts";
+
+async function writeFile(filename: string, content: string): Promise<void> {
+    try {
+        await Deno.writeTextFile(
+            filename,
+            content,
+            {
+                create: true,
+            },
+        );
+    } catch (e) {
+        console.error(" " + e.toString());
+        Deno.exit(1);
+    }
+}
 
 const date = new Date();
 
 const build = {
     arch: Deno.build.os + " " + Deno.build.arch,
     date: date.toISOString(),
-    // https://calver.org/ YYYY.MM.DD
-    version: date.getFullYear() + "." + (date.getMonth() + 1) + "." + date.getUTCDate(),
+    // https://calver.org/ YYYY.MM
+    version: date.getFullYear() + "." + (date.getMonth() + 1),
     module_algo: "SHA-512",
     module_hash: "",
     dict_algo: "MD5",
-    dict_hash: "",
+    dwa_to_eng_dict_hash: "",
 };
 
 // Process dict files
@@ -27,19 +43,25 @@ const build = {
  * @link http://www.bay12forums.com/smf/index.php?topic=173289.msg8005410#msg8005410
  */
 
-const dwarven = new StringReader(await Deno.readTextFile("dwarven.txt"));
-const records = {};
+const source = new StringReader(await Deno.readTextFile("dwarven.txt"));
+const dwa_to_eng_words = {};
 
-for await (const line of readLines(dwarven)) {
+for await (const line of readLines(source)) {
     const parts = line.split(" - ");
     const eng = parts[1].trim().split(",");
-    eng.forEach((el) => el.trim()); // clean up some ugly whitespace
-    records[parts[0].trim()] = eng;
+
+    eng.forEach(
+        (el, i) => eng[i] = el.replace("(n.)", "")
+            .replace("(v.)", "")
+            .trim(),
+    ); // clean up words from source
+
+    dwa_to_eng_words[parts[0].trim()] = eng;
 }
 
-const dwarven_dict = JSON.stringify(records);
+const dwarven_dict = JSON.stringify(dwa_to_eng_words);
 
-build.dict_hash = encode(
+build.dwa_to_eng_dict_hash = encodeToString(
     new Uint8Array(
         await crypto.subtle.digest(
             build.dict_algo as DigestAlgorithm,
@@ -48,7 +70,7 @@ build.dict_hash = encode(
     ),
 );
 
-await Deno.writeTextFile(`web/json/dwa-to-eng.${build.dict_hash}.json`, dwarven_dict);
+writeFile(`web/json/dwa-to-eng.${build.dwa_to_eng_dict_hash}.json`, dwarven_dict).then();
 
 // index.html integrity and dict version
 
@@ -70,12 +92,13 @@ index = index.replace("#VERSION#", build.version)
     .replace("#DATE#", build.date)
     .replace("#MODULE_ALGO#", build.module_algo.replace("-", "").toLowerCase())
     .replace("#MODULE_HASH#", build.module_hash)
-    .replace("#DICT_HASH#", build.dict_hash);
+    .replace("#DICT_HASH#", build.dwa_to_eng_dict_hash);
 
-await Deno.writeTextFile(`web/index.html`, index);
+writeFile(`web/index.html`, index).then();
 
 // wrap up
 
-await Deno.writeTextFile(`build.json`, JSON.stringify(build));
+writeFile(`build.json`, JSON.stringify(build)).then();
 
 console.info(" Done.");
+Deno.exit(0);
