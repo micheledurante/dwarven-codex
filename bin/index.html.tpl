@@ -14,10 +14,6 @@
     <link rel="icon" href="favicon.ico" type="image/x-icon" />
 
     <style>
-        label {
-            display: block;
-        }
-
         a,
         select,
         button {

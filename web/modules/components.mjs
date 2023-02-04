@@ -76,10 +76,10 @@ class WordInput extends HTMLElement {
         this.input.value = value;
     }
 
-    onInput(value) {
+    onInput = (value) => {
         scope.search = value;
         this.value = scope.search;
-    }
+    };
 
     displayWord = (prop, old_val, new_val) => {
         this.value = new_val;
@@ -146,7 +146,7 @@ class DictionarySelector extends HTMLElement {
         this.select.setAttribute("id", this.name);
         const option = document.createElement("option");
         option.value = "0";
-        option.innerText = "English -> Dwarven";
+        option.innerText = "English → Dwarven";
         this.select.append(option);
         const label = document.createElement("label");
         label.setAttribute("for", this.name);
@@ -163,9 +163,9 @@ class DictionarySelector extends HTMLElement {
         this.select.value = value;
     }
 
-    onChange(value) {
+    onChange = (value) => {
         scope.direction = parseInt(value);
-    }
+    };
 
     async connectedCallback() {
         if (parseInt(scope.direction) === DIRECTION.ENG_TO_DWA) {
