@@ -14,7 +14,7 @@ export const PROPS = {
 // Observable, mutable state across components
 export let scope = {
     // List of registered callbacks that will be notified upon changes.
-    _listeners: [],
+    _listeners: {},
 
     // Internal object to hold values accessed by getters and setters
     _value: {
@@ -31,11 +31,15 @@ export let scope = {
     },
 
     notify(prop, old_val, new_val) {
-        this._listeners.forEach((listener) => listener(prop, old_val, new_val));
+        this._listeners[prop].forEach((listener) => listener(prop, old_val, new_val));
     },
 
-    subscribe(listener) {
-        this._listeners.push(listener);
+    subscribe(prop, listener) {
+        if (!this._listeners[prop]) {
+            this._listeners[prop] = []; // init listeners collection
+        }
+
+        this._listeners[prop].push(listener);
     },
 
     unsubscribe(listener) {

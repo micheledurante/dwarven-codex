@@ -15,10 +15,6 @@ class SearchMatchesList extends HTMLElement {
     }
 
     updateSearchMatchesList = (prop, old_val, new_val) => {
-        if (prop !== PROPS.MATCHES) {
-            return;
-        }
-
         let new_matches = [];
 
         for (let i = 0; i < new_val.length; i++) {
@@ -35,7 +31,7 @@ class SearchMatchesList extends HTMLElement {
     };
 
     connectedCallback() {
-        scope.subscribe(this.updateSearchMatchesList);
+        scope.subscribe(PROPS.MATCHES, this.updateSearchMatchesList);
     }
 
     disconnectedCallback() {
@@ -58,7 +54,7 @@ class WordInput extends HTMLInputElement {
             scope.word = this.value;
         }
 
-        scope.subscribe(findSearchMatches);
+        scope.subscribe(PROPS.WORD, findSearchMatches);
         this.addEventListener("input", (e) => this.onInput(e.target.value));
     }
 
