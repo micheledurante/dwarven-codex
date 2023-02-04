@@ -3,6 +3,7 @@ import { StringReader } from "https://deno.land/std@0.174.0/io/string_reader.ts"
 import { crypto, DigestAlgorithm } from "https://deno.land/std@0.174.0/crypto/crypto.ts";
 import { encode } from "https://deno.land/std@0.174.0/encoding/base64.ts";
 import { encodeToString } from "https://deno.land/std@0.97.0/encoding/hex.ts";
+import { emptyDirSync } from "https://deno.land/std@0.174.0/fs/mod.ts";
 
 async function writeFile(filename: string, content: string): Promise<void> {
     try {
@@ -51,9 +52,10 @@ for await (const line of readLines(source)) {
     const eng = parts[1].trim().split(",");
 
     eng.forEach(
-        (el, i) => eng[i] = el.replace("(n.)", "")
-            .replace("(v.)", "")
-            .trim(),
+        (el, i) =>
+            eng[i] = el.replace("(n.)", "")
+                .replace("(v.)", "")
+                .trim(),
     ); // clean up words from source
 
     dwa_to_eng_words[parts[0].trim()] = eng;
@@ -69,6 +71,8 @@ build.dwa_to_eng_dict_hash = encodeToString(
         ),
     ),
 );
+
+emptyDirSync("web/json"); // empty end/or create
 
 writeFile(`web/json/dwa-to-eng.${build.dwa_to_eng_dict_hash}.json`, dwarven_dict).then();
 
