@@ -1,12 +1,11 @@
 import { findSearchMatches } from "./search.mjs";
-import { PROPS, scope } from "./scope.mjs";
-
-const MAX_MATCHES_IN_PREVIEW = 10;
+import { DIRECTION, PROPS, scope } from "./scope.mjs";
 
 // Preview box with the dynamic list of matches. This is updated as the user changes the word search
 class SearchMatchesList extends HTMLElement {
     template;
     shadowRoot;
+    static MAX_MATCHES_IN_PREVIEW = 10;
 
     constructor() {
         super();
@@ -18,7 +17,7 @@ class SearchMatchesList extends HTMLElement {
         let new_matches = [];
 
         for (let i = 0; i < new_val.length; i++) {
-            if (i === MAX_MATCHES_IN_PREVIEW) {
+            if (i === SearchMatchesList.MAX_MATCHES_IN_PREVIEW) {
                 break;
             }
 
@@ -66,6 +65,11 @@ class WordInput extends HTMLInputElement {
 
 // Dropdown to select the dictionary to search, expressed in terms of direction between languages (left -> right)
 class DictionarySelector extends HTMLSelectElement {
+    // The list of all known words in DWA that have translations in ENG. At the moment the translated words in ENG
+    // do not have further details for richer contexts (e.g. multiple meaning, synonyms, etc..) just a simple indication
+    // whether the word is a noun (n.) or a verb (v.)
+    static DWA_TO_ENG;
+
     constructor() {
         super();
     }
@@ -74,7 +78,14 @@ class DictionarySelector extends HTMLSelectElement {
         scope.direction = parseInt(value);
     }
 
-    connectedCallback() {
+    async connectedCallback() {
+        if (parseInt(scope.direction) === DIRECTION.ENG_TO_DWA) {
+            if (!DictionarySelector.DWA_TO_ENG) {
+                const res = await fetch(new Request(DWA_TO_ENG_URI));
+                DictionarySelector.DWA_TO_ENG = await res.json();
+            }
+        }
+
         this.addEventListener("input", (e) => this.onChange(e.target.value));
     }
 

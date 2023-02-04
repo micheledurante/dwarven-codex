@@ -1,9 +1,5 @@
-import { DIRECTION, PROPS, scope } from "./scope.mjs";
-
-// The list of all known words in DWA that have translations in ENG. At the moment the translated words in ENG
-// do not have further details for richer contexts (e.g. multiple meaning, synonyms, etc..) just a simple indication
-// whether the word is a noun (n.) or a verb (v.)
-let DWA_TO_ENG;
+import { DIRECTION, scope } from "./scope.mjs";
+import { DictionarySelector } from "./components.mjs";
 
 function searchEngToDwa(word) {
     if (!word) {
@@ -12,10 +8,10 @@ function searchEngToDwa(word) {
 
     let results = [];
 
-    for (let entry in DWA_TO_ENG) {
-        for (let x = 0; x < DWA_TO_ENG[entry].length; x++) {
-            if (DWA_TO_ENG[entry][x].startsWith(word.toLowerCase())) {
-                results.push(DWA_TO_ENG[entry][x]);
+    for (let entry in DictionarySelector.DWA_TO_ENG) {
+        for (let x = 0; x < DictionarySelector.DWA_TO_ENG[entry].length; x++) {
+            if (DictionarySelector.DWA_TO_ENG[entry][x].startsWith(word.toLowerCase())) {
+                results.push(DictionarySelector.DWA_TO_ENG[entry][x]);
             }
         }
     }
@@ -24,11 +20,6 @@ function searchEngToDwa(word) {
 }
 
 const findSearchMatches = async function (prop, old_val, new_val) {
-    if (!DWA_TO_ENG) {
-        const res = await fetch(new Request(DWA_TO_ENG_URI));
-        DWA_TO_ENG = await res.json();
-    }
-
     if (parseInt(scope.direction) === DIRECTION.ENG_TO_DWA) {
         scope.matches = searchEngToDwa(new_val);
     }

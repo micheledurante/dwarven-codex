@@ -12,7 +12,7 @@ export const PROPS = {
 };
 
 // Observable, mutable state across components
-export let scope = {
+export const scope = {
     // List of registered callbacks that will be notified upon changes.
     _listeners: {},
 
