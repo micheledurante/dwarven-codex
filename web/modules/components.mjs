@@ -1,77 +1,166 @@
-import { findSearchMatches } from "./search.mjs";
+"use strict";
+
+import { displayResultWord, findSearchMatches } from "./search.mjs";
 import { DIRECTION, PROPS, scope } from "./scope.mjs";
 
-// Preview box with the dynamic list of matches. This is updated as the user changes the word search
-class SearchMatchesList extends HTMLElement {
-    template;
+class DwarvenDictionary extends HTMLElement {
     shadowRoot;
-    static MAX_MATCHES_IN_PREVIEW = 10;
 
     constructor() {
         super();
-        this.template = document.getElementById("search-matches-item").content;
         this.shadowRoot = this.attachShadow({ mode: "open" });
+
+        const word_search = document.createElement("word-search");
+        const h2 = document.createElement("h2");
+        h2.innerText = "Dictionary";
+        this.shadowRoot.appendChild(h2);
+        this.shadowRoot.appendChild(word_search);
     }
 
-    updateSearchMatchesList = (prop, old_val, new_val) => {
-        let new_matches = [];
+    // Once the user selects a valid word to search, create and append the element to show the search result word and its
+    // details
+    displaySearchResult() {
+        const search_result = document.createElement("search-result");
+        search_result.setAttribute(PROPS.WORD, scope.word);
 
-        for (let i = 0; i < new_val.length; i++) {
-            if (i === SearchMatchesList.MAX_MATCHES_IN_PREVIEW) {
-                break;
-            }
-
-            const clone = this.template.firstElementChild.cloneNode(true);
-            clone.textContent = new_val[i];
-            new_matches.push(clone);
+        if (this.shadowRoot.querySelector("search-result")) {
+            this.shadowRoot.querySelector("search-result").remove(); // clear any previous result
         }
 
-        this.shadowRoot.replaceChildren(...new_matches);
-    };
-
-    connectedCallback() {
-        scope.subscribe(PROPS.MATCHES, this.updateSearchMatchesList);
+        this.shadowRoot.appendChild(search_result);
     }
 
     disconnectedCallback() {
-        scope.unsubscribe(this.updateSearchMatchesList);
+        this.shadowRoot.replaceChildren();
+    }
+}
+
+class WordSearch extends HTMLElement {
+    shadowRoot;
+
+    constructor() {
+        super();
+        this.shadowRoot = this.attachShadow({ mode: "open" });
+
+        this.shadowRoot.appendChild(document.createElement("word-input"));
+        this.shadowRoot.appendChild(document.createElement("dictionary-selector"));
+        this.shadowRoot.appendChild(document.createElement("search-button"));
+        this.shadowRoot.appendChild(document.createElement("search-matches-list"));
     }
 }
 
 // Input for the word to search in the chosen dictionary
-class WordInput extends HTMLInputElement {
+class WordInput extends HTMLElement {
+    name = "word-input-elem";
+    input;
+    shadowRoot;
+
     constructor() {
         super();
+        this.shadowRoot = this.attachShadow({ mode: "open" });
+
+        this.input = document.createElement("input");
+        this.input.setAttribute("id", this.name);
+        const label = document.createElement("label");
+        label.setAttribute("for", this.name);
+        label.textContent = "Word";
+        this.shadowRoot.appendChild(label);
+        this.shadowRoot.appendChild(this.input);
+    }
+
+    get value() {
+        return this.input.value;
+    }
+
+    set value(value) {
+        this.input.value = value;
     }
 
     onInput(value) {
-        scope.word = value;
+        scope.search = value;
+        this.value = scope.search;
     }
+
+    displayWord = (prop, old_val, new_val) => {
+        this.value = new_val;
+    };
 
     connectedCallback() {
         if (this.value) {
-            scope.word = this.value;
+            scope.search = this.value;
         }
 
-        scope.subscribe(PROPS.WORD, findSearchMatches);
-        this.addEventListener("input", (e) => this.onInput(e.target.value));
+        scope.subscribe(PROPS.SEARCH, findSearchMatches);
+        scope.subscribe(PROPS.WORD, this.displayWord);
+        this.shadowRoot.querySelector("input").addEventListener("input", (e) => this.onInput(e.target.value));
     }
 
     disconnectedCallback() {
         scope.unsubscribe(findSearchMatches);
+        scope.unsubscribe(this.displayWord);
         this.removeEventListener("input", this.onInput);
     }
 }
 
+// Main area where details about the searched word are displayed
+class SearchResult extends HTMLElement {
+    template;
+    shadowRoot;
+
+    constructor() {
+        super();
+        this.template = document.getElementById("search-result").content;
+        this.shadowRoot = this.attachShadow({ mode: "open" });
+    }
+
+    static get observedAttributes() {
+        return [PROPS.WORD];
+    }
+
+    attributeChangedCallback(name, old_value, new_value) {
+        const clone = this.template.cloneNode(true);
+        const h3 = clone.querySelector("h3");
+        h3.textContent = displayResultWord(new_value);
+        const div = clone.querySelector("div");
+        div.textContent = "longer text here";
+
+        this.shadowRoot.append(clone);
+    }
+}
+
 // Dropdown to select the dictionary to search, expressed in terms of direction between languages (left -> right)
-class DictionarySelector extends HTMLSelectElement {
+class DictionarySelector extends HTMLElement {
     // The list of all known words in DWA that have translations in ENG. At the moment the translated words in ENG
     // do not have further details for richer contexts (e.g. multiple meaning, synonyms, etc..) just a simple indication
     // whether the word is a noun (n.) or a verb (v.)
     static DWA_TO_ENG;
+    name = "dictionary-select-elem";
+    select;
+    shadowRoot;
 
     constructor() {
         super();
+        this.shadowRoot = this.attachShadow({ mode: "open" });
+
+        this.select = document.createElement("select");
+        this.select.setAttribute("id", this.name);
+        const option = document.createElement("option");
+        option.value = "0";
+        option.innerText = "English -> Dwarven";
+        this.select.append(option);
+        const label = document.createElement("label");
+        label.setAttribute("for", this.name);
+        label.textContent = "Translation";
+        this.shadowRoot.appendChild(label);
+        this.shadowRoot.appendChild(this.select);
+    }
+
+    get value() {
+        return this.select.value;
+    }
+
+    set value(value) {
+        this.select.value = value;
     }
 
     onChange(value) {
@@ -86,7 +175,7 @@ class DictionarySelector extends HTMLSelectElement {
             }
         }
 
-        this.addEventListener("input", (e) => this.onChange(e.target.value));
+        this.shadowRoot.querySelector("select").addEventListener("input", (e) => this.onChange(e.target.value));
     }
 
     disconnectedCallback() {
@@ -94,22 +183,85 @@ class DictionarySelector extends HTMLSelectElement {
     }
 }
 
-// Button to perform the search on the given word and in the given direction. Populates the detailed view of the results
-class SearchButton extends HTMLButtonElement {
+// Preview box with the dynamic list of matches. This is updated as the user changes the word search
+class SearchMatchesList extends HTMLElement {
+    template;
+    shadowRoot;
+    static MAX_MATCHES_IN_PREVIEW = 10;
+
     constructor() {
         super();
+        this.template = document.getElementById("search-matches-item").content;
+        this.shadowRoot = this.attachShadow({ mode: "open" });
+    }
+
+    selectWordFromMatches(value) {
+        scope.word = scope.search = value;
+        scope.matches = [];
+        const dwarven_dictionary = document.querySelector("dwarven-dictionary");
+        dwarven_dictionary.displaySearchResult();
+    }
+
+    updateSearchMatchesList = (prop, old_val, new_val) => {
+        let new_matches = [];
+
+        for (let i = 0; i < new_val.length; i++) {
+            if (i === SearchMatchesList.MAX_MATCHES_IN_PREVIEW) {
+                break;
+            }
+
+            const clone = this.template.firstElementChild.cloneNode(true);
+            const a = clone.querySelector("a");
+            a.textContent = new_val[i];
+            a.href = "javascript:void(0)";
+            a.setAttribute("data-word", new_val[i]);
+            a.title = "Search '" + new_val[i] + "'";
+            a.addEventListener(
+                "click",
+                (e) => this.selectWordFromMatches(e.target.getAttribute("data-word")),
+            );
+            new_matches.push(clone);
+        }
+
+        if (new_matches.length === 0) {
+            this.shadowRoot.replaceChildren();
+        } else {
+            this.shadowRoot.replaceChildren(...new_matches);
+        }
+    };
+
+    connectedCallback() {
+        scope.subscribe(PROPS.MATCHES, this.updateSearchMatchesList);
+    }
+
+    disconnectedCallback() {
+        scope.unsubscribe(this.updateSearchMatchesList);
+    }
+}
+
+// Button to perform the search on the given word and in the given direction. Populates the detailed view of the results
+class SearchButton extends HTMLElement {
+    shadowRoot;
+
+    constructor() {
+        super();
+        this.shadowRoot = this.attachShadow({ mode: "open" });
+
+        const button = document.createElement("button");
+        button.innerText = "Search";
+        this.shadowRoot.appendChild(button);
     }
 
     onClick() {
     }
 
     connectedCallback() {
-        this.addEventListener("click", (e) => this.onClick(e.target.value));
+        this.addEventListener("click", (_e) => this.onClick());
     }
 
     disconnectedCallback() {
-        this.removeEventListener("click", this.onClick);
+        this.shadowRoot.querySelector("button").removeEventListener("click", this.onClick);
     }
 }
 
-export { DictionarySelector, SearchButton, SearchMatchesList, WordInput };
+export { DictionarySelector, DwarvenDictionary, SearchButton, SearchMatchesList, SearchResult, WordInput, WordSearch };

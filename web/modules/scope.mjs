@@ -1,3 +1,5 @@
+"use strict";
+
 // Values assigned to the direction for dictionary searches
 export const DIRECTION = {
     ENG_TO_DWA: 0,
@@ -7,6 +9,7 @@ export const DIRECTION = {
 // Convenience const for working with the scope's properties names
 export const PROPS = {
     WORD: "word",
+    SEARCH: "search",
     MATCHES: "matches",
     DIRECTION: "direction",
 };
@@ -22,7 +25,10 @@ export const scope = {
         // ENG -> DWA for instance are valid english words
         word: undefined,
 
-        // The results displayed from the search for the given word
+        // The temporary search as the uer types before either clicking `search` or one of the preview results.
+        search: undefined,
+
+        // The results displayed from the search for the given word as the user types in the word input
         matches: [],
 
         // The match will be done from a valid word in the first (left) language to whatever matches it starting from the
@@ -31,6 +37,10 @@ export const scope = {
     },
 
     notify(prop, old_val, new_val) {
+        if (!this._listeners[prop]) {
+            this._listeners[prop] = [];
+        }
+
         this._listeners[prop].forEach((listener) => listener(prop, old_val, new_val));
     },
 
@@ -56,6 +66,20 @@ export const scope = {
             const old_val = this._value.word;
             this._value.word = new_val;
             this.notify(PROPS.WORD, old_val, new_val);
+        }
+    },
+
+    // search
+
+    get search() {
+        return this._value.search;
+    },
+
+    set search(new_val) {
+        if (new_val !== this._value.search) {
+            const old_val = this._value.search;
+            this._value.search = new_val;
+            this.notify(PROPS.SEARCH, old_val, new_val);
         }
     },
 

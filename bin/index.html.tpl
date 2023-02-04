@@ -29,7 +29,8 @@
 
     <script type="module" src="modules/main.mjs"
             integrity="#MODULE_ALGO#-#MODULE_HASH#"
-            crossorigin="anonymous">
+            crossorigin="anonymous"
+            defer>
     </script>
 </head>
 
@@ -39,32 +40,24 @@
         <h1>The Dwarven Codex</h1>
     </header>
     <article>
-        <div id="dwarven-dictionary">
-            <header>
-                <div>
-                    <label for="word-input">Word Search</label>
-                    <input is="word-input" id="word-input" required/>
-                    <search-matches-list>
-                        <ul slot="search-matches-list"></ul>
-                    </search-matches-list>
-                </div>
-                <div>
-                    <label for="dictionary-selector">Dictionary</label>
-                    <select is="dictionary-selector" id="dictionary-selector" required>
-                        <option value="0" selected>English -> Dwarven</option>
-                    </select>
-                </div>
-                <div>
-                    <button is="search-button" type="submit">Search</button>
-                </div>
-            </header>
-        </div>
+        <dwarven-dictionary></dwarven-dictionary>
     </article>
 </main>
 </body>
 
 <template id="search-matches-item">
-    <li></li>
+    <li>
+        <a></a>
+    </li>
+</template>
+
+<template id="search-result" word="">
+    <h3></h3>
+    <div></div>
+</template>
+
+<template id="search-matches-list">
+    <ul></ul>
 </template>
 
 </html>
