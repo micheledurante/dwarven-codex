@@ -27,7 +27,7 @@ const build = {
     date: date.toISOString(),
     // https://calver.org/ YYYY.MM.Modifier
     version: date.getFullYear() + "." + (date.getMonth() + 1) + "." + "alpha1",
-    module_algo: "SHA-512",
+    module_algo: "SHA-384",
     module_hash: "",
     dict_algo: "MD5",
     dwa_to_eng_dict_hash: "",
