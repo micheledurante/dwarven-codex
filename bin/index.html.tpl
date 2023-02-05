@@ -14,6 +14,19 @@
     <link rel="icon" href="favicon.ico" type="image/x-icon" />
 
     <style>
+        html {
+            margin: 0;
+        }
+
+        body {
+            width: 100%;
+            max-width: 960px;
+            line-height: 2rem;
+            margin: 0 auto;
+            font-family: monospace;
+            font-size: 1.2rem;
+        }
+
         a,
         select,
         button {
@@ -21,7 +34,10 @@
         }
     </style>
 
-    <script>const DWA_TO_ENG_URI = "json/dwa-to-eng.#DICT_HASH#.json";</script>
+    <script>
+        const DWA_TO_ENG_URI = "json/dwa-to-eng.#DWA_TO_ENG_DICT_HASH#.json";
+        const DWA_URI = "json/dwa.#DWA_DICT_HASH#.json";
+    </script>
 
     <script type="module" src="modules/main.mjs"
             integrity="#MODULE_ALGO#-#MODULE_HASH#"

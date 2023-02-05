@@ -1,6 +1,6 @@
 "use strict";
 
-import { DIRECTION, PROPS, scope } from "./scope.mjs";
+import { DIRECTION, scope } from "./scope.mjs";
 import { DictionarySelector } from "./components.mjs";
 
 const displayResultWord = function (word) {
@@ -12,7 +12,8 @@ const displayResultWord = function (word) {
         for (let entry in DictionarySelector.DWA_TO_ENG) {
             for (let x = 0; x < DictionarySelector.DWA_TO_ENG[entry].length; x++) {
                 if (DictionarySelector.DWA_TO_ENG[entry][x] === word.toLowerCase()) {
-                    return entry;
+                    const eng = DictionarySelector.DWA[entry];
+                    return [entry, eng];
                 }
             }
         }

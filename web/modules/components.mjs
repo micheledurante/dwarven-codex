@@ -118,11 +118,12 @@ class SearchResult extends HTMLElement {
     }
 
     attributeChangedCallback(name, old_value, new_value) {
+        const result = displayResultWord(new_value);
         const clone = this.template.cloneNode(true);
         const h3 = clone.querySelector("h3");
-        h3.textContent = displayResultWord(new_value);
+        h3.textContent = result[0];
         const div = clone.querySelector("div");
-        div.textContent = "longer text here";
+        div.textContent = result[1];
 
         this.shadowRoot.append(clone);
     }
@@ -134,6 +135,7 @@ class DictionarySelector extends HTMLElement {
     // do not have further details for richer contexts (e.g. multiple meaning, synonyms, etc..) just a simple indication
     // whether the word is a noun (n.) or a verb (v.)
     static DWA_TO_ENG;
+    static DWA;
     name = "dictionary-select-elem";
     select;
     shadowRoot;
@@ -172,6 +174,10 @@ class DictionarySelector extends HTMLElement {
             if (!DictionarySelector.DWA_TO_ENG) {
                 const res = await fetch(new Request(DWA_TO_ENG_URI));
                 DictionarySelector.DWA_TO_ENG = await res.json();
+            }
+            if (!DictionarySelector.DWA) {
+                const res = await fetch(new Request(DWA_URI));
+                DictionarySelector.DWA = await res.json();
             }
         }
 

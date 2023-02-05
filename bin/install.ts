@@ -31,6 +31,7 @@ const build = {
     module_hash: "",
     dict_algo: "MD5",
     dwa_to_eng_dict_hash: "",
+    dwa_dict_hash: "",
 };
 
 // Process dict files
@@ -45,36 +46,50 @@ const build = {
  */
 
 const source = new StringReader(await Deno.readTextFile("dwarven.txt"));
-const dwa_to_eng_words = {};
+const dwa_to_eng = {};
+const dwa = {};
 
 for await (const line of readLines(source)) {
     const parts = line.split(" - ");
     const eng = parts[1].trim().split(",");
 
-    eng.forEach(
-        (el, i) =>
-            eng[i] = el.replace("(n.)", "")
-                .replace("(v.)", "")
-                .trim(),
-    ); // clean up words from source
+    dwa[parts[0].trim()] = eng;
 
-    dwa_to_eng_words[parts[0].trim()] = eng;
+    // clean up words from source
+    dwa_to_eng[parts[0].trim()] = eng.map(
+        (el) => {
+            return el.replace("(n.)", "")
+                .replace("(v.)", "")
+                .trim();
+        },
+    );
 }
 
-const dwarven_dict = JSON.stringify(dwa_to_eng_words);
+const dwa_to_eng_json = JSON.stringify(dwa_to_eng);
+const dwa_json = JSON.stringify(dwa);
 
 build.dwa_to_eng_dict_hash = encodeToString(
     new Uint8Array(
         await crypto.subtle.digest(
             build.dict_algo as DigestAlgorithm,
-            Uint8Array.from(dwarven_dict.split("").map((x) => x.charCodeAt(0))),
+            Uint8Array.from(dwa_to_eng_json.split("").map((x) => x.charCodeAt(0))),
+        ),
+    ),
+);
+
+build.dwa_dict_hash = encodeToString(
+    new Uint8Array(
+        await crypto.subtle.digest(
+            build.dict_algo as DigestAlgorithm,
+            Uint8Array.from(dwa_json.split("").map((x) => x.charCodeAt(0))),
         ),
     ),
 );
 
 emptyDirSync("web/json"); // empty end/or create
 
-writeFile(`web/json/dwa-to-eng.${build.dwa_to_eng_dict_hash}.json`, dwarven_dict).then();
+writeFile(`web/json/dwa-to-eng.${build.dwa_to_eng_dict_hash}.json`, dwa_to_eng_json).then();
+writeFile(`web/json/dwa.${build.dwa_dict_hash}.json`, dwa_json).then();
 
 // index.html integrity and dict version
 
@@ -96,7 +111,8 @@ index = index.replace("#VERSION#", build.version)
     .replace("#DATE#", build.date)
     .replace("#MODULE_ALGO#", build.module_algo.replace("-", "").toLowerCase())
     .replace("#MODULE_HASH#", build.module_hash)
-    .replace("#DICT_HASH#", build.dwa_to_eng_dict_hash);
+    .replace("#DWA_TO_ENG_DICT_HASH#", build.dwa_to_eng_dict_hash)
+    .replace("#DWA_DICT_HASH#", build.dwa_dict_hash);
 
 writeFile(`web/index.html`, index).then();
 
