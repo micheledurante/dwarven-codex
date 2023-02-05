@@ -25,8 +25,8 @@ const date = new Date();
 const build = {
     arch: Deno.build.os + " " + Deno.build.arch,
     date: date.toISOString(),
-    // https://calver.org/ YYYY.MM
-    version: date.getFullYear() + "." + (date.getMonth() + 1),
+    // https://calver.org/ YYYY.MM.Modifier
+    version: date.getFullYear() + "." + (date.getMonth() + 1) + "." + "alpha1",
     module_algo: "SHA-512",
     module_hash: "",
     dict_algo: "MD5",
