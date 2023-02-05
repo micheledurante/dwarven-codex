@@ -3,7 +3,7 @@
 import { displayResultWord, findSearchMatches } from "./search.mjs";
 import { DIRECTION, PROPS, scope } from "./scope.mjs";
 
-class DwarvenDictionary extends HTMLElement {
+class DwarvenTranslator extends HTMLElement {
     shadowRoot;
 
     constructor() {
@@ -12,7 +12,7 @@ class DwarvenDictionary extends HTMLElement {
 
         const word_search = document.createElement("word-search");
         const h2 = document.createElement("h2");
-        h2.innerText = "Dictionary";
+        h2.innerText = "Translator";
         this.shadowRoot.appendChild(h2);
         this.shadowRoot.appendChild(word_search);
     }
@@ -43,8 +43,8 @@ class WordSearch extends HTMLElement {
         this.shadowRoot = this.attachShadow({ mode: "open" });
 
         this.shadowRoot.appendChild(document.createElement("word-input"));
+        this.shadowRoot.appendChild(document.createElement("br"));
         this.shadowRoot.appendChild(document.createElement("dictionary-selector"));
-        this.shadowRoot.appendChild(document.createElement("search-button"));
         this.shadowRoot.appendChild(document.createElement("search-matches-list"));
     }
 }
@@ -152,7 +152,7 @@ class DictionarySelector extends HTMLElement {
         this.select.append(option);
         const label = document.createElement("label");
         label.setAttribute("for", this.name);
-        label.textContent = "Translation";
+        label.textContent = "Dictionary";
         this.shadowRoot.appendChild(label);
         this.shadowRoot.appendChild(this.select);
     }
@@ -204,8 +204,8 @@ class SearchMatchesList extends HTMLElement {
     selectWordFromMatches(value) {
         scope.word = scope.search = value;
         scope.matches = [];
-        const dwarven_dictionary = document.querySelector("dwarven-dictionary");
-        dwarven_dictionary.displaySearchResult();
+        const dwarven_translator = document.querySelector("dwarven-translator");
+        dwarven_translator.displaySearchResult();
     }
 
     updateSearchMatchesList = (prop, old_val, new_val) => {
@@ -245,29 +245,4 @@ class SearchMatchesList extends HTMLElement {
     }
 }
 
-// Button to perform the search on the given word and in the given direction. Populates the detailed view of the results
-class SearchButton extends HTMLElement {
-    shadowRoot;
-
-    constructor() {
-        super();
-        this.shadowRoot = this.attachShadow({ mode: "open" });
-
-        const button = document.createElement("button");
-        button.innerText = "Search";
-        this.shadowRoot.appendChild(button);
-    }
-
-    onClick() {
-    }
-
-    connectedCallback() {
-        this.addEventListener("click", (_e) => this.onClick());
-    }
-
-    disconnectedCallback() {
-        this.shadowRoot.querySelector("button").removeEventListener("click", this.onClick);
-    }
-}
-
-export { DictionarySelector, DwarvenDictionary, SearchButton, SearchMatchesList, SearchResult, WordInput, WordSearch };
+export { DictionarySelector, DwarvenTranslator, SearchMatchesList, SearchResult, WordInput, WordSearch };

@@ -27,10 +27,18 @@
             font-size: 1.2rem;
         }
 
-        a,
-        select,
-        button {
-            cursor: pointer;
+        aside {
+            display: inline-block;
+            width: 100%;
+            max-width: 239px;
+            vertical-align: top;
+        }
+
+        article {
+            display: inline-block;
+            width: 100%;
+            max-width: 480px;
+            vertical-align: top;
         }
     </style>
 
@@ -51,9 +59,10 @@
     <header>
         <h1>The Dwarven Codex</h1>
     </header>
-    <article>
-        <dwarven-dictionary></dwarven-dictionary>
-    </article>
+    <aside>
+        <dwarven-translator></dwarven-translator>
+    </aside>
+    <article></article>
 </main>
 </body>
 

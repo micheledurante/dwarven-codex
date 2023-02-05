@@ -2,8 +2,7 @@
 
 import {
     DictionarySelector,
-    DwarvenDictionary,
-    SearchButton,
+    DwarvenTranslator,
     SearchMatchesList,
     SearchResult,
     WordInput,
@@ -11,10 +10,9 @@ import {
 } from "./components.mjs";
 
 // register components
-customElements.define("search-button", SearchButton);
 customElements.define("search-result", SearchResult);
 customElements.define("dictionary-selector", DictionarySelector);
 customElements.define("word-input", WordInput);
 customElements.define("word-search", WordSearch);
-customElements.define("dwarven-dictionary", DwarvenDictionary);
+customElements.define("dwarven-translator", DwarvenTranslator);
 customElements.define("search-matches-list", SearchMatchesList);
