@@ -1,8 +1,8 @@
 # Dwarven Codex
 
-Written in vanilla JS with ES5 imports, web components and ES2015 features.
+Written in vanilla JS with ES modules, Web Components and ES2015 features.
 
-To install the application, Deno and TS are used.
+To build the application, Deno and TS are used.
 
 ## Install
 

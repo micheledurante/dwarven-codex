@@ -45,6 +45,10 @@
     "https://deno.land/std@0.174.0/path/separator.ts": "0fb679739d0d1d7bf45b68dacfb4ec7563597a902edbaf3c59b50d5bcadd93b1",
     "https://deno.land/std@0.174.0/path/win32.ts": "672942919dd66ce1b8c224e77d3447e2ad8254eaff13fe6946420a9f78fa141e",
     "https://deno.land/std@0.174.0/types.d.ts": "220ed56662a0bd393ba5d124aa6ae2ad36a00d2fcbc0e8666a65f4606aaa9784",
-    "https://deno.land/std@0.97.0/encoding/hex.ts": "f952e0727bddb3b2fd2e6889d104eacbd62e92091f540ebd6459317a61932d9b"
+    "https://deno.land/std@0.97.0/encoding/hex.ts": "f952e0727bddb3b2fd2e6889d104eacbd62e92091f540ebd6459317a61932d9b",
+    "https://esm.sh/showdown@2.1.0": "000c1cd8252545ee4fc1b82cca67333b4ffcfc479ff739b1965804409104c769",
+    "https://esm.sh/v106/@types/showdown@2.0.0/index.d.ts": "0cae38d42cef880ce4848fcd9ed704d65ba3ecc825443cd548ff81931c64cdca",
+    "https://esm.sh/v106/showdown@2.1.0/deno/showdown.js": "c8a6dc2e68373b5ad9e38562727b16f3af0f13d1b40307b976e1cc1a82a36cba",
+    "https://unpkg.com/showdown@2.1.0/dist/showdown.min.js": "88eb6fbbe0c270ddf3384aee0c9620d070e090a26e07c67421ae36c903b5d649"
   }
 }

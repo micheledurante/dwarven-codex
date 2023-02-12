@@ -4,6 +4,7 @@ import { crypto, DigestAlgorithm } from "https://deno.land/std@0.174.0/crypto/cr
 import { encode } from "https://deno.land/std@0.174.0/encoding/base64.ts";
 import { encodeToString } from "https://deno.land/std@0.97.0/encoding/hex.ts";
 import { emptyDirSync } from "https://deno.land/std@0.174.0/fs/mod.ts";
+import * as showdown from "https://esm.sh/showdown@2.1.0";
 
 async function writeFile(filename: string, content: string): Promise<void> {
     try {
@@ -91,7 +92,41 @@ emptyDirSync("web/json"); // empty end/or create
 writeFile(`web/json/dwa-to-eng.${build.dwa_to_eng_dict_hash}.json`, dwa_to_eng_json).then();
 writeFile(`web/json/dwa.${build.dwa_dict_hash}.json`, dwa_json).then();
 
-// index.html integrity and dict version
+// build nav menu from grammar book
+
+const grammar_book = new StringReader(await Deno.readTextFile("dwarven_grammar_book.md"));
+let grammar_nav = [];
+let grammar = [];
+const converter = new showdown.default.Converter();
+const grammar_lines = [];
+
+for await (const line of readLines(grammar_book)) {
+    grammar_lines.push(line);
+}
+
+for (const line of grammar_lines) {
+    if (line.length === 0) {
+        continue;
+    }
+
+    if (line.startsWith("### 1")) { // End of Contents section
+        break;
+    }
+
+    grammar_nav.push(line);
+}
+
+for (let i = 0; i < grammar_lines.length; i++) {
+    if (grammar_lines[i].startsWith("### 1")) { // Start of body of text
+        for (let x = i; x < grammar_lines.length; x++) {
+            grammar.push(grammar_lines[x]);
+        }
+
+        break;
+    }
+}
+
+// index.tpl.html integrity and dict version
 
 const mjs_integrity = await Deno.readTextFile("web/modules/main.mjs");
 
@@ -104,7 +139,7 @@ build.module_hash = encode(
     ),
 );
 
-let index = await Deno.readTextFile("bin/index.html.tpl");
+let index = await Deno.readTextFile("bin/index.tpl.html");
 
 index = index.replace("#VERSION#", build.version)
     .replace("#ARCH#", build.arch)
@@ -112,7 +147,9 @@ index = index.replace("#VERSION#", build.version)
     .replace("#MODULE_ALGO#", build.module_algo.replace("-", "").toLowerCase())
     .replace("#MODULE_HASH#", build.module_hash)
     .replace("#DWA_TO_ENG_DICT_HASH#", build.dwa_to_eng_dict_hash)
-    .replace("#DWA_DICT_HASH#", build.dwa_dict_hash);
+    .replace("#DWA_DICT_HASH#", build.dwa_dict_hash)
+    .replace("#GRAMMAR_NAV#", converter.makeHtml(grammar_nav.join("\n")))
+    .replace("#GRAMMAR#", converter.makeHtml(grammar.join("\n")));
 
 writeFile(`web/index.html`, index).then();
 

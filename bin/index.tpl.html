@@ -10,9 +10,6 @@
     <meta charset="utf-8"/>
     <title>The Dwarven Codex</title>
 
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    <link rel="icon" href="favicon.ico" type="image/x-icon" />
-
     <style>
         html {
             margin: 0;
@@ -21,24 +18,27 @@
         body {
             width: 100%;
             max-width: 960px;
-            line-height: 2rem;
+            line-height: 1.3rem;
             margin: 0 auto;
             font-family: monospace;
-            font-size: 1.2rem;
+            font-size: 0.9rem;
         }
 
         aside {
             display: inline-block;
-            width: 100%;
-            max-width: 239px;
+            width: 25%;
             vertical-align: top;
+            background-color: rgb(255 252 247);
+            padding: 0.5%;
         }
 
         article {
             display: inline-block;
-            width: 100%;
-            max-width: 480px;
+            width: 70%;
+            margin: 0 0 0 2%;
             vertical-align: top;
+            padding: 0.5%;
+            background-color: rgb(255 252 252);
         }
     </style>
 
@@ -61,10 +61,24 @@
     </header>
     <aside>
         <dwarven-translator></dwarven-translator>
+        <grammar-navigation></grammar-navigation>
     </aside>
-    <article></article>
+    <article>
+        <dwarven-grammar></dwarven-grammar>
+    </article>
 </main>
 </body>
+
+<template id="grammar-navigation">
+    <h2></h2>
+    <nav>#GRAMMAR_NAV#</nav>
+</template>
+
+<template id="dwarven-grammar">#GRAMMAR#</template>
+
+<template id="dwarven-translator">
+    <h2></h2>
+</template>
 
 <template id="search-matches-item">
     <li>

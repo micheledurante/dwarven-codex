@@ -12,7 +12,8 @@
     "fmt": {
         "files": {
             "exclude": [
-                "web/json/"
+                "web/json/",
+                "dwarven_grammar_book.md"
             ]
         },
         "options": {

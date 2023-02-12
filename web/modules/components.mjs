@@ -3,15 +3,48 @@
 import { displayResultWord, findSearchMatches } from "./search.mjs";
 import { DIRECTION, PROPS, scope } from "./scope.mjs";
 
-class DwarvenTranslator extends HTMLElement {
+class DwarvenGrammar extends HTMLElement {
+    template;
     shadowRoot;
 
     constructor() {
         super();
         this.shadowRoot = this.attachShadow({ mode: "open" });
+        this.template = document.getElementById("dwarven-grammar").content;
 
+        this.shadowRoot.appendChild(this.template.cloneNode(true));
+    }
+}
+
+class GrammarNavigation extends HTMLElement {
+    template;
+    shadowRoot;
+
+    constructor() {
+        super();
+        this.shadowRoot = this.attachShadow({ mode: "open" });
+        this.template = document.getElementById("grammar-navigation").content;
+
+        const clone = this.template.cloneNode(true);
+        const h2 = clone.querySelector("h2");
+        h2.innerText = "Table of Contents";
+        this.shadowRoot.appendChild(h2);
+        this.shadowRoot.appendChild(clone);
+    }
+}
+
+class DwarvenTranslator extends HTMLElement {
+    template;
+    shadowRoot;
+
+    constructor() {
+        super();
+        this.template = document.getElementById("dwarven-translator").content;
+        this.shadowRoot = this.attachShadow({ mode: "open" });
+
+        const clone = this.template.cloneNode(true);
         const word_search = document.createElement("word-search");
-        const h2 = document.createElement("h2");
+        const h2 = clone.querySelector("h2");
         h2.innerText = "Translator";
         this.shadowRoot.appendChild(h2);
         this.shadowRoot.appendChild(word_search);
@@ -42,9 +75,9 @@ class WordSearch extends HTMLElement {
         super();
         this.shadowRoot = this.attachShadow({ mode: "open" });
 
-        this.shadowRoot.appendChild(document.createElement("word-input"));
-        this.shadowRoot.appendChild(document.createElement("br"));
         this.shadowRoot.appendChild(document.createElement("dictionary-selector"));
+        this.shadowRoot.appendChild(document.createElement("br"));
+        this.shadowRoot.appendChild(document.createElement("word-input"));
         this.shadowRoot.appendChild(document.createElement("search-matches-list"));
     }
 }
@@ -61,10 +94,6 @@ class WordInput extends HTMLElement {
 
         this.input = document.createElement("input");
         this.input.setAttribute("id", this.name);
-        const label = document.createElement("label");
-        label.setAttribute("for", this.name);
-        label.textContent = "Word";
-        this.shadowRoot.appendChild(label);
         this.shadowRoot.appendChild(this.input);
     }
 
@@ -150,10 +179,6 @@ class DictionarySelector extends HTMLElement {
         option.value = "0";
         option.innerText = "English → Dwarven";
         this.select.append(option);
-        const label = document.createElement("label");
-        label.setAttribute("for", this.name);
-        label.textContent = "Dictionary";
-        this.shadowRoot.appendChild(label);
         this.shadowRoot.appendChild(this.select);
     }
 
@@ -245,4 +270,13 @@ class SearchMatchesList extends HTMLElement {
     }
 }
 
-export { DictionarySelector, DwarvenTranslator, SearchMatchesList, SearchResult, WordInput, WordSearch };
+export {
+    DictionarySelector,
+    DwarvenGrammar,
+    DwarvenTranslator,
+    GrammarNavigation,
+    SearchMatchesList,
+    SearchResult,
+    WordInput,
+    WordSearch,
+};
