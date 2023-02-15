@@ -29,10 +29,10 @@ const build = {
     // https://calver.org/ YYYY.MM.Modifier
     version: date.getFullYear() + "." + (date.getMonth() + 1) + "." + "alpha1",
     module_algo: "SHA-384",
-    module_hash: "",
+    module_hash: undefined,
     dict_algo: "MD5",
-    dwa_to_eng_dict_hash: "",
-    dwa_dict_hash: "",
+    dwa_to_eng_dict_hash: undefined,
+    dwa_dict_hash: undefined,
 };
 
 // Process dict files
@@ -95,9 +95,13 @@ writeFile(`web/json/dwa.${build.dwa_dict_hash}.json`, dwa_json).then();
 // build nav menu from grammar book
 
 const grammar_book = new StringReader(await Deno.readTextFile("dwarven_grammar_book.md"));
-let grammar_nav = [];
-let grammar = [];
-const converter = new showdown.default.Converter();
+const grammar_nav = [];
+const grammar = [];
+// https://github.com/showdownjs/showdown/wiki/Showdown's-Markdown-syntax
+const converter = new showdown.default.Converter({
+    tables: true,
+    headerLevelStart: 2,
+});
 const grammar_lines = [];
 
 for await (const line of readLines(grammar_book)) {
@@ -109,7 +113,7 @@ for (const line of grammar_lines) {
         continue;
     }
 
-    if (line.startsWith("### 1")) { // End of Contents section
+    if (line.startsWith("## 1")) { // End of Contents section
         break;
     }
 
@@ -117,7 +121,7 @@ for (const line of grammar_lines) {
 }
 
 for (let i = 0; i < grammar_lines.length; i++) {
-    if (grammar_lines[i].startsWith("### 1")) { // Start of body of text
+    if (grammar_lines[i].startsWith("## 1")) { // Start of body of text
         for (let x = i; x < grammar_lines.length; x++) {
             grammar.push(grammar_lines[x]);
         }

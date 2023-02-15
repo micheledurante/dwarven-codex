@@ -21,5 +21,8 @@
             "indentWidth": 4,
             "singleQuote": false
         }
+    },
+    "tasks": {
+        "install": "deno fmt && deno run --allow-read --allow-write --allow-sys bin/install.ts"
     }
 }

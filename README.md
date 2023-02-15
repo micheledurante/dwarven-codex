@@ -1,17 +1,15 @@
 # Dwarven Codex
 
-Written in vanilla JS with ES modules, Web Components and ES2015 features.
+Written in vanilla JS with native JS modules, Web Components and other ES6 features.
 
-To build the application, Deno and TS are used.
+To build the application, Deno is used.
 
 ## Install
 
-Before running the application, language files and other steps must be performed with:
+1. Make sure you have [Deno](https://deno.land/)
+2. `deno task install`
 
-1. Install [Deno](https://deno.land/)
-2. `deno run --allow-read --allow-write --allow-sys .\bin\install.ts`
-
-You can now run `web/index.html` with a modern browser: there is no support for anything older than ES2015.
+You can now run `web/index.html` with a modern browser: there is no support for anything older than ES6.
 
 ### Installation Process in Details
 
