@@ -258,6 +258,17 @@ class SearchMatchesList extends BaseHTMLElement {
     constructor() {
         super();
         this.template = document.getElementById("search-matches-item").content;
+
+        this.style.textContent += `
+            ul {
+                margin: 4px 0;
+                padding: 0 0 0 20px;
+            }
+        `;
+
+        const clone = this.template.cloneNode(true);
+        this.shadowRoot.appendChild(clone.getElementById("search-matches-item__list"));
+        this.shadowRoot.getElementById("search-matches-item__list").replaceChildren();
     }
 
     selectWordFromMatches(value) {
@@ -275,7 +286,7 @@ class SearchMatchesList extends BaseHTMLElement {
                 break;
             }
 
-            const clone = this.template.firstElementChild.cloneNode(true);
+            const clone = this.template.cloneNode(true).getElementById("search-matches-item__item");
             const a = clone.querySelector("a");
             a.textContent = new_val[i];
             a.href = "javascript:void(0)";
@@ -289,11 +300,9 @@ class SearchMatchesList extends BaseHTMLElement {
         }
 
         if (new_matches.length === 0) {
-            this.shadowRoot.replaceChildren();
-            this.shadowRoot.appendChild(this.style);
+            this.shadowRoot.getElementById("search-matches-item__list").replaceChildren();
         } else {
-            this.shadowRoot.replaceChildren(...new_matches);
-            this.shadowRoot.appendChild(this.style);
+            this.shadowRoot.getElementById("search-matches-item__list").replaceChildren(...new_matches);
         }
     };
 
