@@ -27,7 +27,7 @@ const build = {
     arch: Deno.build.os + " " + Deno.build.arch,
     date: date.toISOString(),
     // https://calver.org/ YYYY.MM.Modifier
-    version: date.getFullYear() + "." + (date.getMonth() + 1) + "." + "alpha2",
+    version: date.getFullYear() + "." + (date.getMonth() + 1) + "." + "alpha3",
     module_algo: "SHA-384",
     module_hash: undefined,
     dict_algo: "MD5",
