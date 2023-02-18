@@ -65,6 +65,28 @@ class GrammarNavigation extends BaseHTMLElement {
         this.shadowRoot.appendChild(h2);
         this.shadowRoot.appendChild(clone);
     }
+
+    scrollToId(id) {
+        document.getElementsByTagName("dwarven-grammar")[0]
+            .shadowRoot
+            .getElementById(id.replace("#", ""))
+            .scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    connectedCallback() {
+        for (let a of this.shadowRoot.querySelectorAll("a")) {
+            a.addEventListener(
+                "click",
+                (e) => this.scrollToId(e.target.getAttribute("href")),
+            );
+        }
+    }
+
+    disconnectedCallback() {
+        for (let a of this.shadowRoot.querySelectorAll("a")) {
+            a.removeEventListener("click", this.scrollToId);
+        }
+    }
 }
 
 class DwarvenTranslator extends BaseHTMLElement {
@@ -118,6 +140,12 @@ class WordInput extends BaseHTMLElement {
 
     constructor() {
         super();
+
+        this.style.textContent += `
+            input {
+                margin: 2px 0 0;
+            }
+        `;
 
         this.shadowRoot.appendChild(this.style);
         this.input = document.createElement("input");
