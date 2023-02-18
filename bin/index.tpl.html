@@ -41,6 +41,15 @@
             padding: 0.5%;
             background-color: rgb(255 252 247);
         }
+
+        header h1 {
+            margin: 0;
+            line-height: 64px;
+        }
+
+        #top {
+            border-bottom: 1px solid rgb(255, 255, 255);
+        }
     </style>
 
     <script>
@@ -55,6 +64,7 @@
 </head>
 
 <body>
+<div id="top"></div>
 <main>
     <header>
         <h1>The Dwarven Codex</h1>
@@ -91,6 +101,13 @@
     <div id="search-result__wrapper">
         <h3 id="search-result__heading"></h3>
         <div id="search-result__content"></div>
+    </div>
+</template>
+
+<template id="scroll-to-top">
+    <div id="scroll-to-top__content">
+        <!-- &#129121; -->
+        <a href="javascript:void(0)" id="scroll-to-top__link">Top 🡡</a>
     </div>
 </template>
 

@@ -5,6 +5,7 @@ import {
     DwarvenGrammar,
     DwarvenTranslator,
     GrammarNavigation,
+    ScrollToTop,
     SearchMatchesList,
     SearchResult,
     WordInput,
@@ -378,6 +379,7 @@ export const base_style = `
 `;
 
 // register components
+customElements.define("scroll-to-top", ScrollToTop);
 customElements.define("dwarven-grammar", DwarvenGrammar);
 customElements.define("grammar-navigation", GrammarNavigation);
 customElements.define("search-result", SearchResult);

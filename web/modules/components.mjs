@@ -21,11 +21,54 @@ class BaseHTMLElement extends HTMLElement {
         this.style.textContent = base_style;
         this.shadowRoot.appendChild(this.style); // Any additional style can be appended to style.textContent
 
-        // for template the implementation is left to each component
+        // for HTML template the implementation is left to each component
+    }
+}
+
+// The link to scroll back to the top of the page from further down the document
+class ScrollToTop extends BaseHTMLElement {
+    constructor() {
+        super();
+        this.template = document.getElementById("scroll-to-top").content;
+
+        this.style.textContent += `
+            #scroll-to-top__content {
+                position: fixed;
+                bottom: 0;
+                text-align: right;
+                left: 0;
+                right: 0;
+                line-height: 32px;
+                max-width: 960px;
+                width: 100%;
+                margin: 0 auto;
+            }
+        `;
+
+        const clone = this.template.cloneNode(true);
+        this.shadowRoot.appendChild(clone.getElementById("scroll-to-top__content"));
+    }
+
+    scrollToTop(e) {
+        e.preventDefault();
+        document.getElementById("top").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    connectedCallback() {
+        this.shadowRoot.getElementById("scroll-to-top__link").addEventListener(
+            "click",
+            (e) => this.scrollToTop(e),
+        );
+    }
+
+    disconnectedCallback() {
+        this.shadowRoot.getElementById("scroll-to-top__link").removeEventListener("click", this.scrollToTop);
     }
 }
 
 class DwarvenGrammar extends BaseHTMLElement {
+    HEADER_H1_HEIGHT = 66;
+
     constructor() {
         super();
         this.template = document.getElementById("dwarven-grammar").content;
@@ -50,6 +93,26 @@ class DwarvenGrammar extends BaseHTMLElement {
         `;
 
         this.shadowRoot.appendChild(this.template.cloneNode(true));
+    }
+
+    showScrollToTop() {
+        const topOffset = window.pageYOffset || document.documentElement.scrollTop;
+
+        if (topOffset >= this.HEADER_H1_HEIGHT && !this.shadowRoot.querySelector("scroll-to-top")) {
+            this.shadowRoot.appendChild(document.createElement("scroll-to-top"));
+        }
+
+        if (topOffset < this.HEADER_H1_HEIGHT && this.shadowRoot.querySelector("scroll-to-top")) {
+            this.shadowRoot.querySelector("scroll-to-top").remove();
+        }
+    }
+
+    connectedCallback() {
+        document.addEventListener("scroll", (_e) => this.showScrollToTop());
+    }
+
+    disconnectedCallback() {
+        document.removeEventListener("scroll", this.showScrollToTop);
     }
 }
 
@@ -242,7 +305,7 @@ class DictionarySelector extends BaseHTMLElement {
         this.select.setAttribute("id", this.name);
         const option = document.createElement("option");
         option.value = "0";
-        option.innerText = "English → Dwarven";
+        option.innerText = "English 🠆 Dwarven"; // &#129030;
         this.select.append(option);
         this.shadowRoot.appendChild(this.select);
     }
@@ -299,8 +362,9 @@ class SearchMatchesList extends BaseHTMLElement {
         this.shadowRoot.getElementById("search-matches-item__list").replaceChildren();
     }
 
-    selectWordFromMatches(value) {
-        scope.word = scope.search = value;
+    selectWordFromMatches(e) {
+        e.preventDefault();
+        scope.word = scope.search = e.target.getAttribute("data-word");
         scope.matches = [];
         const dwarven_translator = document.querySelector("dwarven-translator");
         dwarven_translator.displaySearchResult();
@@ -320,10 +384,7 @@ class SearchMatchesList extends BaseHTMLElement {
             a.href = "javascript:void(0)";
             a.setAttribute("data-word", new_val[i]);
             a.title = `Search "${new_val[i]}"`;
-            a.addEventListener(
-                "click",
-                (e) => this.selectWordFromMatches(e.target.getAttribute("data-word")),
-            );
+            a.addEventListener("click", (e) => this.selectWordFromMatches(e));
             new_matches.push(clone);
         }
 
@@ -348,6 +409,7 @@ export {
     DwarvenGrammar,
     DwarvenTranslator,
     GrammarNavigation,
+    ScrollToTop,
     SearchMatchesList,
     SearchResult,
     WordInput,
