@@ -350,13 +350,6 @@ class SearchMatchesList extends BaseHTMLElement {
         super();
         this.template = document.getElementById("search-matches-item").content;
 
-        this.style.textContent += `
-            ul {
-                margin: 4px 0;
-                padding: 0 0 0 20px;
-            }
-        `;
-
         const clone = this.template.cloneNode(true);
         this.shadowRoot.appendChild(clone.getElementById("search-matches-item__list"));
         this.shadowRoot.getElementById("search-matches-item__list").replaceChildren();

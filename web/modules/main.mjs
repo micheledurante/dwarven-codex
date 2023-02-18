@@ -27,6 +27,16 @@ export const base_style = `
         border: 0 none;
     }
     
+    ul {
+        margin: 4px 0;
+        padding: 0 0 0 24px;
+    }
+    
+    ol {
+        margin: 4px 0;
+        padding: 0 0 0 32px;
+    }
+    
     /*! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css */
 
     /* Document
