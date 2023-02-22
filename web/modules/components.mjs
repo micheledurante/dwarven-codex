@@ -51,7 +51,7 @@ class ScrollToTop extends BaseHTMLElement {
 
     scrollToTop(e) {
         e.preventDefault();
-        document.getElementById("top").scrollIntoView({ behavior: "smooth", block: "start" });
+        document.getElementById("top").scrollIntoView({ behavior: "auto", block: "start" });
     }
 
     connectedCallback() {
@@ -121,7 +121,6 @@ class GrammarNavigation extends BaseHTMLElement {
         super();
         this.template = document.getElementById("grammar-navigation").content;
 
-        this.shadowRoot.appendChild(this.style);
         const clone = this.template.cloneNode(true);
         const h2 = clone.querySelector("h2");
         h2.innerText = "Table of Contents";
@@ -130,7 +129,7 @@ class GrammarNavigation extends BaseHTMLElement {
     }
 
     scrollToId(id) {
-        document.getElementsByTagName("dwarven-grammar")[0]
+        document.querySelector("dwarven-grammar")
             .shadowRoot
             .getElementById(id.replace("#", ""))
             .scrollIntoView({ behavior: "smooth", block: "start" });
@@ -157,7 +156,6 @@ class DwarvenTranslator extends BaseHTMLElement {
         super();
         this.template = document.getElementById("dwarven-translator").content;
 
-        this.shadowRoot.appendChild(this.style);
         const clone = this.template.cloneNode(true);
         const word_search = document.createElement("word-search");
         const h2 = clone.querySelector("h2");
@@ -166,8 +164,8 @@ class DwarvenTranslator extends BaseHTMLElement {
         this.shadowRoot.appendChild(word_search);
     }
 
-    // Once the user selects a valid word to search, create and append the element to show the search result word and its
-    // details
+    // Once the user selects a valid word to search, create and append the element to show the search result word and
+    // its details
     displaySearchResult() {
         const search_result = document.createElement("search-result");
         search_result.setAttribute(PROPS.WORD, scope.word);
@@ -198,7 +196,7 @@ class WordSearch extends BaseHTMLElement {
 
 // Input for the word to search in the chosen dictionary
 class WordInput extends BaseHTMLElement {
-    name = "word-input-elem";
+    // holds a reference to the internal `<input>` of the component
     input;
 
     constructor() {
@@ -210,9 +208,8 @@ class WordInput extends BaseHTMLElement {
             }
         `;
 
-        this.shadowRoot.appendChild(this.style);
         this.input = document.createElement("input");
-        this.input.setAttribute("id", this.name);
+        this.input.setAttribute("id", "word-input-elem");
         this.shadowRoot.appendChild(this.input);
     }
 
@@ -276,12 +273,12 @@ class SearchResult extends BaseHTMLElement {
     }
 
     attributeChangedCallback(name, old_value, new_value) {
-        const result = displayResultWord(new_value);
+        const resultWord = displayResultWord(new_value);
         const clone = this.template.cloneNode(true);
         const h3 = clone.getElementById("search-result__heading");
-        h3.textContent = result[0];
+        h3.textContent = resultWord.entry;
         const div = clone.getElementById("search-result__content");
-        div.textContent = result[1];
+        div.textContent = resultWord.translation;
 
         this.shadowRoot.append(clone);
     }
@@ -289,25 +286,44 @@ class SearchResult extends BaseHTMLElement {
 
 // Dropdown to select the dictionary to search, expressed in terms of direction between languages (left -> right)
 class DictionarySelector extends BaseHTMLElement {
-    // The list of all known words in DWA that have translations in ENG. At the moment the translated words in ENG
-    // do not have further details for richer contexts (e.g. multiple meaning, synonyms, etc..) just a simple indication
-    // whether the word is a noun (n.) or a verb (v.)
+    // The list of all known words in DWA that have translations in ENG
     static DWA_TO_ENG;
-    static DWA;
-    name = "dictionary-select-elem";
+    // holds a reference to the internal `<select>` of the component
     select;
 
     constructor() {
         super();
 
-        this.shadowRoot.appendChild(this.style);
         this.select = document.createElement("select");
-        this.select.setAttribute("id", this.name);
+        this.select.setAttribute("id", "dictionary-select-elem");
+        this.select.append(this.englishToDwarvenOption());
+        this.select.append(this.dwarvenToEnglishOption());
+        this.shadowRoot.appendChild(this.select);
+    }
+
+    englishToDwarvenOption() {
+        // ⇄ &#8644;
         const option = document.createElement("option");
         option.value = "0";
         option.innerText = "English 🠆 Dwarven"; // &#129030;
-        this.select.append(option);
-        this.shadowRoot.appendChild(this.select);
+
+        if (scope.direction === DIRECTION.ENG_TO_DWA) {
+            option.setAttribute("selected", "");
+        }
+
+        return option;
+    }
+
+    dwarvenToEnglishOption() {
+        const option = document.createElement("option");
+        option.value = "1";
+        option.innerText = "Dwarven 🠆 English";
+
+        if (scope.direction === DIRECTION.DWA_TO_ENG) {
+            option.setAttribute("selected", "");
+        }
+
+        return option;
     }
 
     get value() {
@@ -320,25 +336,25 @@ class DictionarySelector extends BaseHTMLElement {
 
     onChange = (value) => {
         scope.direction = parseInt(value);
+        // trigger an update to the preview of matches in case there is a value in the word search input
+        if (scope.search) {
+            const current_search = scope.search;
+            scope.search = ""; // first empty the results
+            scope.search = current_search;
+        }
     };
 
     async connectedCallback() {
-        if (parseInt(scope.direction) === DIRECTION.ENG_TO_DWA) {
-            if (!DictionarySelector.DWA_TO_ENG) {
-                const res = await fetch(new Request(DWA_TO_ENG_URI));
-                DictionarySelector.DWA_TO_ENG = await res.json();
-            }
-            if (!DictionarySelector.DWA) {
-                const res = await fetch(new Request(DWA_URI));
-                DictionarySelector.DWA = await res.json();
-            }
+        if (!DictionarySelector.DWA_TO_ENG) {
+            const res = await fetch(new Request(DWA_TO_ENG_URI));
+            DictionarySelector.DWA_TO_ENG = await res.json();
         }
 
-        this.shadowRoot.querySelector("select").addEventListener("input", (e) => this.onChange(e.target.value));
+        this.shadowRoot.querySelector("select").addEventListener("change", (e) => this.onChange(e.target.value));
     }
 
     disconnectedCallback() {
-        this.removeEventListener("change", this.onChange);
+        this.shadowRoot.querySelector("select").addEventListener("change", this.onChange);
     }
 }
 

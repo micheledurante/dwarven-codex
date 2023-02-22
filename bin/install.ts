@@ -27,12 +27,11 @@ const build = {
     arch: Deno.build.os + " " + Deno.build.arch,
     date: date.toISOString(),
     // https://calver.org/ YYYY.MM.Modifier
-    version: date.getFullYear() + "." + (date.getMonth() + 1) + "." + "alpha3",
+    version: date.getFullYear() + "." + (date.getMonth() + 1) + "." + "alpha4",
     module_algo: "SHA-384",
-    module_hash: undefined,
+    module_hash: "",
     dict_algo: "MD5",
-    dwa_to_eng_dict_hash: undefined,
-    dwa_dict_hash: undefined,
+    dwa_to_eng_dict_hash: "",
 };
 
 // Process dict files
@@ -59,15 +58,12 @@ for await (const line of readLines(source)) {
     // clean up words from source
     dwa_to_eng[parts[0].trim()] = eng.map(
         (el) => {
-            return el.replace("(n.)", "")
-                .replace("(v.)", "")
-                .trim();
+            return el.trim();
         },
     );
 }
 
 const dwa_to_eng_json = JSON.stringify(dwa_to_eng);
-const dwa_json = JSON.stringify(dwa);
 
 build.dwa_to_eng_dict_hash = encodeToString(
     new Uint8Array(
@@ -78,19 +74,9 @@ build.dwa_to_eng_dict_hash = encodeToString(
     ),
 );
 
-build.dwa_dict_hash = encodeToString(
-    new Uint8Array(
-        await crypto.subtle.digest(
-            build.dict_algo as DigestAlgorithm,
-            Uint8Array.from(dwa_json.split("").map((x) => x.charCodeAt(0))),
-        ),
-    ),
-);
-
 emptyDirSync("web/json"); // empty end/or create
 
 writeFile(`web/json/dwa-to-eng.${build.dwa_to_eng_dict_hash}.json`, dwa_to_eng_json).then();
-writeFile(`web/json/dwa.${build.dwa_dict_hash}.json`, dwa_json).then();
 
 // build nav menu from grammar book
 
@@ -151,7 +137,6 @@ index = index.replace("#VERSION#", build.version)
     .replace("#MODULE_ALGO#", build.module_algo.replace("-", "").toLowerCase())
     .replace("#MODULE_HASH#", build.module_hash)
     .replace("#DWA_TO_ENG_DICT_HASH#", build.dwa_to_eng_dict_hash)
-    .replace("#DWA_DICT_HASH#", build.dwa_dict_hash)
     .replace("#GRAMMAR_NAV#", converter.makeHtml(grammar_nav.join("\n")))
     .replace("#GRAMMAR#", converter.makeHtml(grammar.join("\n")));
 
